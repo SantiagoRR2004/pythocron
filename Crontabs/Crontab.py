@@ -24,11 +24,15 @@ currentDate = datetime.date.today()
 
 scripts = {}
 
-with open(crontabsFile, "r") as file:
-    data = json.load(file)
+# Now we read the file if it exists
+data = {}
+if os.path.exists(crontabsFile):
+    with open(crontabsFile, "r") as file:
+        data = json.load(file)
 
+scripts.update(data)
+data = scripts
 
-#data = scripts
 for script, date in data.items():
 
     if datetime.datetime.strptime(date, "%Y-%m-%d").date() != currentDate:

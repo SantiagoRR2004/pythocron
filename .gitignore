@@ -2,5 +2,3 @@ __pycache__/
 
 Crontabs/counter.txt
 Crontabs/output.log
-
-node_modules/

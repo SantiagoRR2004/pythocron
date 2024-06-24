@@ -22,7 +22,7 @@ except FileNotFoundError:
 
 currentDate = datetime.date.today()
 
-scripts = {}
+scripts = {"setupCrontab.py":"2023-01-01",}
 
 # Now we read the file if it exists
 data = {}

@@ -1,8 +1,15 @@
 import subprocess
 
+
 def runTerminal(command):
     try:
-        completed_process = subprocess.run(command, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        completed_process = subprocess.run(
+            command,
+            shell=True,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
         if completed_process.returncode == 0:
             print("Command executed successfully!")
             print("Output:")
@@ -14,7 +21,8 @@ def runTerminal(command):
     except Exception as e:
         print("An error occurred:", e)
 
-def addNewCronTasks(newTasks:list) -> None:
+
+def addNewCronTasks(newTasks: list) -> None:
     """
     This function will add new tasks to the crontab
     without deleting the old ones.
@@ -25,7 +33,9 @@ def addNewCronTasks(newTasks:list) -> None:
     Returns:
         None
     """
-    result = subprocess.run(['crontab', '-l'], capture_output=True, text=True, check=True)
+    result = subprocess.run(
+        ["crontab", "-l"], capture_output=True, text=True, check=True
+    )
 
     if not result.stderr:
         oldTasks = result.stdout.split("\n")

@@ -5,8 +5,8 @@ import os
 
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = os.environ.copy()
-env['PYTHONPATH'] = path
-env['PATH'] = os.pathsep.join([path, os.environ.get('PATH', '')])
+env["PYTHONPATH"] = path
+env["PATH"] = os.pathsep.join([path, os.environ.get("PATH", "")])
 
 directory = os.path.dirname(os.path.abspath(__file__))
 counterFile = os.path.join(directory, "counter.txt")
@@ -22,7 +22,9 @@ except FileNotFoundError:
 
 currentDate = datetime.date.today()
 
-scripts = {"setupCrontab.py":"2023-01-01",}
+scripts = {
+    "setupCrontab.py": "2023-01-01",
+}
 
 # Now we read the file if it exists
 data = {}
@@ -39,14 +41,19 @@ for script, date in data.items():
         print(script)
         scriptFile = os.path.join(directory, script)
 
-        process = subprocess.Popen(['python3', scriptFile], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+        process = subprocess.Popen(
+            ["python3", scriptFile],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
 
         return_code = process.wait()
         output, error = process.communicate()
 
         print("Return Code:", return_code)
         print("Error Message:", error.decode())
-        if error.decode() == "": # We have executed today if it works
+        if error.decode() == "":  # We have executed today if it works
             data[script] = currentDate.strftime("%Y-%m-%d")
         print(output.decode())
 
@@ -58,14 +65,3 @@ counter += 1
 
 with open(counterFile, "w") as file:
     file.write(str(counter))
-
-
-
-
-
-
-
-
-
-
-

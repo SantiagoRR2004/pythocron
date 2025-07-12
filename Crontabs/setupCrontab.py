@@ -32,10 +32,12 @@ if __name__ == "__main__":
 
     output = os.path.join(directory, "output.log")
 
+    cronLocation = os.path.join(directory, "runCron.sh")
+
     Utils.addNewCronTasks(
         [
-            f"{every5Min} {otherInstructions} python3 {dailyPrograms} >> {output} 2>&1",
-            f"{everyMin} {otherInstructions} python3 {backgroundChanger} >> {output} 2>&1",
+            f"{every5Min} {otherInstructions} {cronLocation} {dailyPrograms}",
+            f"{everyMin} {otherInstructions} {cronLocation} {backgroundChanger}",
         ]
     )
 

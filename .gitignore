@@ -1,4 +1,5 @@
 __pycache__/
+.venv/
 
 Crontabs/counter.txt
 Crontabs/output.log

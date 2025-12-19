@@ -1,5 +1,5 @@
 import os
-from Modules import Utils
+from modules import Utils
 
 if __name__ == "__main__":
 

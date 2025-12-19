@@ -11,12 +11,44 @@ class CrontabManager:
 
     env = os.environ.copy()
 
-    def setup(self, pythonFiles: list[str]) -> None:
-        pass
+    def setup(self, pythonFiles: list[dict]) -> None:
+        """
+        Prepare the files for automatic execution
+
+        Args:
+            - pythonFiles (list[dict]): List of python files to add to the crontab
+                The keys of the dict are:
+                    - "file": The file to add
+
+        Returns:
+            - None
+        """
+        # Open old contrabs
+        data = {}
+        if os.path.exists(self.crontabsFile):
+            with open(self.crontabsFile, "r") as file:
+                data = json.load(file)
+
+        # Add the files
+        for file in pythonFiles:
+            data[file["file"]] = "2023-01-01"
+
+        # Save the crontab files
+        with open(self.crontabsFile, "w") as file:
+            # TODO: Create function to dump like Prettier
+            json.dump(data, file, indent=2, ensure_ascii=False)
+            file.write("\n")
 
     def main(self) -> None:
-        """ """
+        """
+        Run all the files that are in the crontab file
 
+        Args:
+            - None
+
+        Returns:
+            - None
+        """
         # Keep counter updated
         try:
             with open(self.counterFile, "r") as file:

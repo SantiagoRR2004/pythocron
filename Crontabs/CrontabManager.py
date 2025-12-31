@@ -97,6 +97,40 @@ class CrontabManager:
         with open(self.counterFile, "w") as file:
             file.write(str(counter + 1))
 
+    def createCronCommand(self) -> str:
+        """
+        Create the cron command to add to the crontab the
+        current file with the necessary environment variables.
+
+        Args:
+            - None
+
+        Returns:
+            - str: The cron command
+        """
+        every5Min = "*/5 * * * *"
+        currentFile = os.path.abspath(__file__)
+
+        otherInstructionsList = [
+            f"export DISPLAY={os.getenv('DISPLAY')}",
+            f"export XAUTHORITY={os.getenv('XAUTHORITY')}",
+            "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin",
+        ]
+
+        otherInstructions = ""
+
+        for instruction in otherInstructionsList:
+            otherInstructions += f"{instruction} && "
+        else:
+            otherInstructions = otherInstructions[:-1]  # Remove the last space
+
+        cronLocation = os.path.join(self.currentDirectory, "runCron.sh")
+        """
+        */5 * * * * export DISPLAY=?? && export XAUTHORITY=?? && export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin && /absolutePath/runCron.sh /absolutePath/CrontabManager.py
+        """
+
+        return f"{every5Min} {otherInstructions} {cronLocation} {currentFile}"
+
     @staticmethod
     def runTerminal(command: str) -> None:
         """

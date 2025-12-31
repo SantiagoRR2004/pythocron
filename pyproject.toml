@@ -3,9 +3,9 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "Modules"
+name = "pythocron"
 version = "0.1.0"
-description = "Some things I made"
+description = "A library to run Python files once each day."
 readme = "README.md"
 requires-python = ">=3.7"
 license = { text = "GPL-3.0-or-later" }
@@ -15,4 +15,4 @@ dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["modules*"]
+include = ["pythocron*"]

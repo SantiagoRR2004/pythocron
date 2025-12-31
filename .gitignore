@@ -1,6 +1,6 @@
 __pycache__/
 .venv/
 
-Crontabs/counter.txt
-Crontabs/output.log
-Crontabs/Crontabs.json
+counter.txt
+output.log
+Crontabs.json

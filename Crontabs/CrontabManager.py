@@ -149,7 +149,9 @@ class CrontabManager:
             oldTasks = result.stdout.split("\n")
             for task in newTasks:
                 if task not in oldTasks:
-                    CrontabManager.runTerminal(f"(crontab -l; echo '{task}') | crontab -")
+                    CrontabManager.runTerminal(
+                        f"(crontab -l; echo '{task}') | crontab -"
+                    )
 
 
 if __name__ == "__main__":

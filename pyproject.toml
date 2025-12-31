@@ -16,3 +16,6 @@ dependencies = {file = ["requirements.txt"]}
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["pythocron*"]
+
+[tool.setuptools.package-data]
+"pythocron" = ["**/*.sh"]

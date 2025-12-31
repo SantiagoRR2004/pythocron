@@ -11,11 +11,15 @@ class CrontabManager:
 
     env = os.environ.copy()
 
-    def setup(self, pythonFiles: list[dict]) -> None:
+    def setup(self, environmentPath: str, pythonFiles: list[dict] = []) -> None:
         """
-        Prepare the files for automatic execution
+        Prepare the files for automatic execution. Each python file will be run
+        every 5 minutes until it succeeds. Once it succeeds, it will not be run again
+        until the next day.
 
         Args:
+            - environmentPath (str): The path to the environment. It needs to be the absolute with
+                bin/activate at the end.
             - pythonFiles (list[dict]): List of python files to add to the crontab
                 The keys of the dict are:
                     - "file": The file to add
@@ -38,6 +42,10 @@ class CrontabManager:
             # TODO: Create function to dump like Prettier
             json.dump(data, file, indent=2, ensure_ascii=False)
             file.write("\n")
+
+        # Add the cron command
+        cronCommand = self.createCronCommand(environmentPath=environmentPath)
+        CrontabManager.addNewCronTasks([cronCommand])
 
     def main(self) -> None:
         """
@@ -97,12 +105,14 @@ class CrontabManager:
         with open(self.counterFile, "w") as file:
             file.write(str(counter + 1))
 
-    def createCronCommand(self) -> str:
+    def createCronCommand(self, environmentPath: str) -> str:
         """
         Create the cron command to add to the crontab the
         current file with the necessary environment variables.
 
         Args:
+            - environmentPath (str): The path to the environment. It needs to be the absolute with
+                bin/activate at the end.
             - None
 
         Returns:
@@ -126,10 +136,10 @@ class CrontabManager:
 
         cronLocation = os.path.join(self.currentDirectory, "runCron.sh")
         """
-        */5 * * * * export DISPLAY=?? && export XAUTHORITY=?? && export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin && /absolutePath/runCron.sh /absolutePath/CrontabManager.py
+        */5 * * * * export DISPLAY=?? && export XAUTHORITY=?? && export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin && /absolutePath/runCron.sh /absolutePath/environment/bin/activate /absolutePath/CrontabManager.py
         """
 
-        return f"{every5Min} {otherInstructions} {cronLocation} {currentFile}"
+        return f"{every5Min} {otherInstructions} {cronLocation} {environmentPath} {currentFile}"
 
     @staticmethod
     def runTerminal(command: str) -> None:

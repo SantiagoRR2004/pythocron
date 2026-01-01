@@ -90,7 +90,6 @@ class CrontabManager:
         logger = logging.getLogger()
         logger.setLevel(logging.INFO)
 
-
         for script, config in data.items():
 
             if (
@@ -98,7 +97,9 @@ class CrontabManager:
                 != currentDate
             ):
                 handler = logging.FileHandler(config["logFile"], mode="a")
-                formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+                formatter = logging.Formatter(
+                    "%(asctime)s - %(levelname)s - %(message)s"
+                )
                 handler.setFormatter(formatter)
 
                 # Remove old handlers

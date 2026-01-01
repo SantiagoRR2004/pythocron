@@ -1,5 +1,6 @@
 import subprocess
 import datetime
+import logging
 import json
 import os
 
@@ -8,7 +9,7 @@ class CrontabManager:
     currentDirectory = os.path.dirname(os.path.abspath(__file__))
     counterFile = os.path.join(currentDirectory, "counter.txt")
     crontabsFile = os.path.join(currentDirectory, "Crontabs.json")
-    outputFile = os.path.join(currentDirectory, "output.log")
+    logFile = os.path.join(currentDirectory, "output.log")
 
     env = os.environ.copy()
 
@@ -26,7 +27,7 @@ class CrontabManager:
                     - "file" (str): The file to add
                     - "oncePerDay" (bool): If True, the file will be run once per day.
                         Default is True.
-                    - "outputFile" (str): The file to save the output. Default is output.log
+                    - "logFile" (str): The file to save the output. Default is output.log
 
         Returns:
             - None
@@ -49,7 +50,7 @@ class CrontabManager:
 
             data[file["file"]]["oncePerDay"] = file.get("oncePerDay", True)
 
-            data[file["file"]]["outputFile"] = file.get("outputFile", self.outputFile)
+            data[file["file"]]["logFile"] = file.get("logFile", self.logFile)
 
         # Save the crontab files
         with open(self.crontabsFile, "w") as file:
@@ -86,13 +87,25 @@ class CrontabManager:
 
         currentDate = datetime.date.today()
 
+        logger = logging.getLogger()
+        logger.setLevel(logging.INFO)
+
+
         for script, config in data.items():
 
             if (
                 datetime.datetime.strptime(config["date"], "%Y-%m-%d").date()
                 != currentDate
             ):
-                print(script)
+                handler = logging.FileHandler(config["logFile"], mode="a")
+                formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+                handler.setFormatter(formatter)
+
+                # Remove old handlers
+                logger.handlers = []
+                logger.addHandler(handler)
+
+                logging.info(script)
 
                 process = subprocess.Popen(
                     ["python3", script],
@@ -104,13 +117,15 @@ class CrontabManager:
                 return_code = process.wait()
                 output, error = process.communicate()
 
-                print("Return Code:", return_code)
-                print("Error Message:", error.decode())
+                logging.info("Return Code: %s", return_code)
+                if error.decode() != "":
+                    logging.error(error.decode())
 
                 if error.decode() == "":  # We have executed today if it works
                     config["date"] = currentDate.strftime("%Y-%m-%d")
 
-                print(output.decode())
+                if output.decode() != "":
+                    logging.info(output.decode())
 
         # Save the most recent dates
         with open(self.crontabsFile, "w") as file:

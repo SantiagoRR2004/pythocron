@@ -8,6 +8,7 @@ class CrontabManager:
     currentDirectory = os.path.dirname(os.path.abspath(__file__))
     counterFile = os.path.join(currentDirectory, "counter.txt")
     crontabsFile = os.path.join(currentDirectory, "Crontabs.json")
+    outputFile = os.path.join(currentDirectory, "output.log")
 
     env = os.environ.copy()
 
@@ -22,7 +23,10 @@ class CrontabManager:
                 bin/activate at the end.
             - pythonFiles (list[dict]): List of python files to add to the crontab
                 The keys of the dict are:
-                    - "file": The file to add
+                    - "file" (str): The file to add
+                    - "oncePerDay" (bool): If True, the file will be run once per day.
+                        Default is True.
+                    - "outputFile" (str): The file to save the output. Default is output.log
 
         Returns:
             - None
@@ -35,7 +39,17 @@ class CrontabManager:
 
         # Add the files
         for file in pythonFiles:
-            data[file["file"]] = "2023-01-01"
+
+            # Add empty if not exists
+            data.setdefault(file["file"], {})
+
+            # Do not override the date
+            if "date" not in data[file["file"]]:
+                data[file["file"]]["date"] = "2023-01-01"
+
+            data[file["file"]]["oncePerDay"] = file.get("oncePerDay", True)
+
+            data[file["file"]]["outputFile"] = file.get("outputFile", self.outputFile)
 
         # Save the crontab files
         with open(self.crontabsFile, "w") as file:
@@ -72,9 +86,12 @@ class CrontabManager:
 
         currentDate = datetime.date.today()
 
-        for script, date in data.items():
+        for script, config in data.items():
 
-            if datetime.datetime.strptime(date, "%Y-%m-%d").date() != currentDate:
+            if (
+                datetime.datetime.strptime(config["date"], "%Y-%m-%d").date()
+                != currentDate
+            ):
                 print(script)
 
                 process = subprocess.Popen(
@@ -91,7 +108,7 @@ class CrontabManager:
                 print("Error Message:", error.decode())
 
                 if error.decode() == "":  # We have executed today if it works
-                    data[script] = currentDate.strftime("%Y-%m-%d")
+                    config["date"] = currentDate.strftime("%Y-%m-%d")
 
                 print(output.decode())
 

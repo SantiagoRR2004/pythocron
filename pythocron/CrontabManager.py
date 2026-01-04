@@ -13,7 +13,12 @@ class CrontabManager:
 
     env = os.environ.copy()
 
-    def setup(self, environmentPath: str, pythonFiles: list[dict] = []) -> None:
+    def setup(
+        self,
+        environmentPath: str,
+        pythonFiles: list[dict] = [],
+        updateEnvironment: bool = True,
+    ) -> None:
         """
         Prepare the files for automatic execution. Each python file will be run
         every 5 minutes until it succeeds. Once it succeeds, it will not be run again
@@ -28,10 +33,22 @@ class CrontabManager:
                     - "oncePerDay" (bool): If True, the file will be run once per day.
                         Default is True.
                     - "logFile" (str): The file to save the output. Default is output.log
+            - updateEnvironment (bool): If True, the environment will be updated using a
+                python script. Default is True.
 
         Returns:
             - None
         """
+        # Update the environment task
+        if updateEnvironment:
+            pythonFiles.append(
+                {
+                    "file": os.path.join(self.currentDirectory, "updateEnvironment.py"),
+                    "oncePerDay": True,
+                    "logFile": os.path.join(self.currentDirectory, "updateEnv.log"),
+                }
+            )
+
         # Open old contrabs
         data = {}
         if os.path.exists(self.crontabsFile):

@@ -132,14 +132,18 @@ class CrontabManager:
                     env=self.env,
                 )
 
-                return_code = process.wait()
+                returnCode = process.wait()
                 output, error = process.communicate()
 
-                logging.info("Return Code: %s", return_code)
-                if error.decode() != "":
-                    logging.error(error.decode())
+                logging.info("Return Code: %s", returnCode)
 
-                if error.decode() == "":  # We have executed today if it works
+                if returnCode != 0:
+                    logging.error(error.decode())
+                elif error.decode() != "":
+                    # Warning but return code is 0
+                    logging.warning(error.decode())
+
+                if returnCode == 0:  # We have executed today if it works
                     config["date"] = currentDate.strftime("%Y-%m-%d")
 
                 if output.decode() != "":
